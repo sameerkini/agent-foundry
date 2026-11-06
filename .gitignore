@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+.venv/
+.bootstrap/
+.foundry/
+__pycache__/
+.pytest_cache/
+*.pyc
+dist/
+.DS_Store

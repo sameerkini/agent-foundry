@@ -1,0 +1,103 @@
+{
+  "tests_passed": 83,
+  "tests_skipped": 1,
+  "paid_model_calls": 0,
+  "files": [
+    {
+      "path": "examples/fieldnote/adapter.py",
+      "sha256": "4c21cbb34534d471fca607d1f06feca7b4bb0eb008daafb2b10edadcd0a3293e"
+    },
+    {
+      "path": "examples/mcp_demo.py",
+      "sha256": "d665bf93acd74783c779bccf7dffeb078af8cae3712c9ce604eee4bff8ecd18c"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "2e572236d0340b2770071a22780377ecc3872b1cce5d1621eaf38d6250f8ab8b"
+    },
+    {
+      "path": "src/agent_foundry/__init__.py",
+      "sha256": "a1386bf7d9ee664868c1cae9310ea9184d804888274ef1da4797763a7a69291d"
+    },
+    {
+      "path": "src/agent_foundry/builtin_tools.py",
+      "sha256": "47e89c52a5874295e3bf6f597f9674115e524cdf6df530415e5e0087c2e08b98"
+    },
+    {
+      "path": "src/agent_foundry/cli.py",
+      "sha256": "a70a6f387a12eb70eb4a96fa2b69d97579f597192912287e9e9ad5c612be16d0"
+    },
+    {
+      "path": "src/agent_foundry/context.py",
+      "sha256": "5cca1747dfa1109a86c5cc8f89f1013e2bdddf4a32445c317bbdfbf932b9b07a"
+    },
+    {
+      "path": "src/agent_foundry/extensions.py",
+      "sha256": "2357f2812deb57aea26beb06ab8b5151eb23b5115b52b569c09e30cc8e3ccc85"
+    },
+    {
+      "path": "src/agent_foundry/guards.py",
+      "sha256": "7c2992fb3150e5caf8c1d8025549c035d23334e7f5fe00c98ba070968f145ce9"
+    },
+    {
+      "path": "src/agent_foundry/mcp_adapter.py",
+      "sha256": "2f00d5f3c3eb7bb7330976aea234813279bcabdabce330e71d788995a7513775"
+    },
+    {
+      "path": "src/agent_foundry/memory.py",
+      "sha256": "e48c2c6b9fa06907fefd7b736dcd9c2661ef8c9eb6dd9af4f5a1343930083860"
+    },
+    {
+      "path": "src/agent_foundry/models.py",
+      "sha256": "2af4540bcaabd047b4d67ef94246a67dac6acc490f2a030f03114b1d75fe2836"
+    },
+    {
+      "path": "src/agent_foundry/registry.py",
+      "sha256": "17f41a9d575ab509713eadd279bd6da04ebc745d8d7fd2e1cdafef6063e9dc8e"
+    },
+    {
+      "path": "src/agent_foundry/runner.py",
+      "sha256": "dd9ed3a1b6ddd78f43a292e065b145fed9e566a63b28efe31c3e7b26d592c593"
+    },
+    {
+      "path": "src/agent_foundry/sandbox.py",
+      "sha256": "72cc515d4035cd9108be9d463a4fde2c608b4a05e5a7a7e236ad0811494f4b2c"
+    },
+    {
+      "path": "src/agent_foundry/types.py",
+      "sha256": "309fa10bb7ac1d3bad06b7bd78e908d8da4d2f8428822cc463457a16fd1b4eea"
+    },
+    {
+      "path": "tests/test_context.py",
+      "sha256": "964a59476d76d39e878d2ec09b881e9827268370c02111e70a47b977202a1ac8"
+    },
+    {
+      "path": "tests/test_examples.py",
+      "sha256": "878195b274bae0449e725c754826b8ed585fb1b54521f2ff532ff2e7fa3f04fc"
+    },
+    {
+      "path": "tests/test_extensions.py",
+      "sha256": "db7557b3dd6f60b440eb42a0e37c6681160c8c050c0c9d8e27d712e8a5ab6eeb"
+    },
+    {
+      "path": "tests/test_mcp_adapter.py",
+      "sha256": "e1404b2c24bed6d9fb94ae379c89a3228aff92567efab0907a57d8d0a835532a"
+    },
+    {
+      "path": "tests/test_memory.py",
+      "sha256": "ecdd82ee09c8c24890a88971beda1faa52992d68fae5e007bd2bb4101b69d5d3"
+    },
+    {
+      "path": "tests/test_runner.py",
+      "sha256": "325f91c5138461d1073880d5478a6b4622563e84fb7b4970c66838ed82c429b4"
+    },
+    {
+      "path": "tests/test_sandbox.py",
+      "sha256": "323af93f7ab53da72a11e999e89e297fedbf48f241eba0eb8a00a539f4768d9e"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "346cd9c0bc4c16acfe2d4c0e7ab34ea511c22234f11a590d367ce8fa6dcbfda4"
+    }
+  ]
+}

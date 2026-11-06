@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "domain": "research_station_operations",
+  "title": "Fieldnote fictional station demonstration",
+  "synthetic": true,
+  "provenance": "Newly authored fictional observations and protocols; no real instrument measurements or external datasets.",
+  "period": {
+    "start": "2026-04-01",
+    "end": "2026-04-04",
+    "timezone": "UTC"
+  },
+  "database": "operations.db",
+  "documents": [
+    {
+      "id": "alp-field-report",
+      "title": "Alpine Ridge field report",
+      "path": "documents/alp-field-report.md",
+      "kind": "field_report",
+      "sha256": "8dbfd04a91de8d40dcde66ec6820d929ea9db5a0d48d2cdf2261ae2c6ea82eb6",
+      "site_id": "ALP"
+    },
+    {
+      "id": "mar-field-report",
+      "title": "Marsh Observatory field report",
+      "path": "documents/mar-field-report.md",
+      "kind": "field_report",
+      "sha256": "cb118ad3d01acbc76a621c43fe0768c5f4ef09e46015fbc7fe80678bd6de085c",
+      "site_id": "MAR"
+    },
+    {
+      "id": "pin-field-report",
+      "title": "Pine Valley field report",
+      "path": "documents/pin-field-report.md",
+      "kind": "field_report",
+      "sha256": "89339ab6d39a86a1b6ed0765fbe0e2c40b76f5eb445901295ce03f2bb96a7cf1",
+      "site_id": "PIN"
+    },
+    {
+      "id": "quality-protocol",
+      "title": "Observation quality and aggregation protocol",
+      "path": "documents/quality-protocol.md",
+      "kind": "protocol",
+      "sha256": "998f674fd010ad4b235cad6a09869fc5f1ad061dcfb2ab1be9431c75f113098a"
+    },
+    {
+      "id": "units-time-protocol",
+      "title": "Units time and schema guide",
+      "path": "documents/units-time-protocol.md",
+      "kind": "protocol",
+      "sha256": "5a43b21467ec335d7383f37eb5239802eccf63211d07933a7f204c2c9b3359f7"
+    },
+    {
+      "id": "maintenance-protocol",
+      "title": "Maintenance evidence and causal interpretation",
+      "path": "documents/maintenance-protocol.md",
+      "kind": "protocol",
+      "sha256": "0d0d1cca2303c83133c2c2c1fe79071352697e562a1d400c120609128ebc695b"
+    }
+  ]
+}

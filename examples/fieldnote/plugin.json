@@ -1,0 +1,11 @@
+{
+  "name": "fieldnote",
+  "version": 1,
+  "description": "Fictional research station observations and field reports",
+  "skills": ["skills/research/SKILL.md"],
+  "tools": [
+    {"factory": "fieldnote.sql", "options": {}},
+    {"factory": "fieldnote.search", "options": {}},
+    {"factory": "fieldnote.calculate", "options": {}}
+  ]
+}
