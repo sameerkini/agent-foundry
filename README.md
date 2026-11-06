@@ -2,7 +2,7 @@
 
 **An inspectable agent harness: a model chooses actions; the runtime controls tools, state, permissions and evidence.** Fieldnote is the first application example, using fictional research-station measurements and reports.
 
-This is a local v0 foundation for a larger portfolio project. It has no GitHub remote or public deployment yet. The core is newly authored and provider-neutral; it is not a model-training framework.
+This is an early portfolio prototype that runs locally. The core is newly authored and provider-neutral; it is not a model-training framework or a hosted service.
 
 For a file-by-file and function-by-function tour, start with [the code walkthrough](docs/CODE_WALKTHROUGH.md). VS Code workspace settings select the local environment and pytest. In **Run and Debug**, choose a zero-API demo preset, set a breakpoint in `Runner._drive`, and press F5 to inspect each transition.
 
@@ -11,6 +11,8 @@ For a file-by-file and function-by-function tour, start with [the code walkthrou
 Requirements: Python 3.11+ on macOS/Linux or Windows through WSL. No GPU or Docker is required for the basic example.
 
 ```sh
+git clone https://github.com/sameerkini/agent-foundry.git
+cd agent-foundry
 bash setup.sh
 .venv/bin/foundry demo
 .venv/bin/python -m pytest -q
@@ -143,4 +145,4 @@ The provider-neutral `Model` protocol is the connection point for your future tr
 
 Software tests, scripted end-to-end runs and actual local MCP protocol tests are separate from model-quality evaluations. No paid provider calls or broad accuracy claims are included in this milestone. Docker runtime execution and remote MCP/model compatibility remain unverified. See [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [validation](docs/VALIDATION.md).
 
-Before a public release: review the exact code/data provenance, choose a license, validate the live provider path, wire the Fieldnote UI adapter if desired, and publish only reviewed artifacts. The local project does not inherit another application's Git history or private evaluation records.
+Next milestones are live provider validation, real Docker execution, matched answer-quality evaluations, and an optional Fieldnote UI adapter. See [provenance](docs/PROVENANCE.md) for code/data origin, AI assistance and licensing status. The repository excludes local credentials, private runtime state and unrelated application materials.

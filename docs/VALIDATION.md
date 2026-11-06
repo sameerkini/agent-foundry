@@ -1,6 +1,6 @@
 # Validation record
 
-November 6, 2026. This is a local v0 engineering milestone, with no public remote or deployment.
+November 6, 2026. This record describes the local v0 engineering checks. Source publication is separate from deployment and live-model validation.
 
 ## Observed checks
 
