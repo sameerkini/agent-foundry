@@ -56,6 +56,7 @@ class RunConfig:
     context_char_budget: int = 32000
     observation_char_limit: int = 6000
     allowed_capabilities: frozenset[str] = frozenset({'data.read', 'files.read', 'skills.read', 'memory.read', 'working.write'})
+    reasoning_mode: str = 'off'
 
 @dataclass
 class RunResult:

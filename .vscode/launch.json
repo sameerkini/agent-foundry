@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Foundry: demo (no API calls)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "agent_foundry.cli",
+      "args": ["demo", "--reasoning", "off"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Foundry: plan-review demo (no API calls)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "agent_foundry.cli",
+      "args": ["demo", "--reasoning", "plan-review"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Foundry: local MCP demo (no API calls)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/mcp_demo.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

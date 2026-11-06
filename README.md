@@ -4,6 +4,8 @@
 
 This is a local v0 foundation for a larger portfolio project. It has no GitHub remote or public deployment yet. The core is newly authored and provider-neutral; it is not a model-training framework.
 
+For a file-by-file and function-by-function tour, start with [the code walkthrough](docs/CODE_WALKTHROUGH.md). VS Code workspace settings select the local environment and pytest. In **Run and Debug**, choose a zero-API demo preset, set a breakpoint in `Runner._drive`, and press F5 to inspect each transition.
+
 ## Run the zero-API demo
 
 Requirements: Python 3.11+ on macOS/Linux or Windows through WSL. No GPU or Docker is required for the basic example.
@@ -75,6 +77,7 @@ flowchart TD
 | Approvals | Side-effecting actions pause; resumption binds to exact arguments, run and runtime fingerprint | This is a local-user prototype, not multi-tenant authorization |
 | Context | Character-bounded complete-turn/tool-group compaction; full results remain addressable artifacts | Character measurement is not tokenizer-exact accounting |
 | Working memory | Current notes, artifacts and checkpoints | Public task state; no hidden chain-of-thought collection |
+| Optional reasoning scaffold | Public task parts, evidence coverage review and a review bound to the exact final draft | Off by default; bookkeeping checks do not certify semantic correctness |
 | Long-term memory | Explicit scoped facts/preferences with provenance, TTL, retrieval and deletion | No automatic conversion of tool output into trusted memory |
 | Skills | Discover metadata, then load host-approved Markdown instructions | Instructions do not execute code or grant permissions |
 | Plugins | Declarative manifests select approved tool factories and skill resources | No arbitrary import/install hook or self-granted capability |
@@ -122,7 +125,17 @@ The Docker tests inspect constraints and failure behavior; the actual engine int
 
 ## Reasoning, training and the future transformer
 
-The loop supports a ReAct-style action/observation workflow without demanding hidden chain-of-thought. Visible plans, tool requests, observations and outcomes are the useful debugging evidence. The provider-neutral `Model` protocol is the connection point for your future transformer, provided it can emit the tool-call contract.
+The loop supports a ReAct-style action/observation workflow without demanding hidden chain-of-thought. The optional `plan-review` scaffold adds a concise public task plan before tool work and a coverage review before release. That review refers to actual run artifacts and must match the final draft; new tool work makes it stale. These are workflow checks, not an independent proof that the answer follows from its evidence.
+
+```sh
+.venv/bin/foundry demo --reasoning plan-review
+.venv/bin/foundry chat "Compare valid readings across stations and explain quality caveats." --reasoning plan-review
+.venv/bin/foundry chat "Count the readings." --reasoning off
+```
+
+The default is `off`; `REASONING_SCAFFOLD=plan-review` can set a local preference. This is independent of provider `REASONING_EFFORT`: disabling the scaffold does not disable a model's internal reasoning, its tools, or ordinary policy checks. Explicit planning/review can add model exchanges and tokens. Compare both modes on matched questions before assuming it improves quality. See [reasoning design](docs/REASONING.md).
+
+The provider-neutral `Model` protocol is the connection point for your future transformer, provided it can emit the tool-call contract. The current adapter uses Chat Completions; providers/models that require a Responses-specific tool protocol need a separate adapter.
 
 **Deferred:** a DPO training pipeline. First establish trustworthy evaluations, then collect reviewed chosen/rejected responses or trajectories with consent and provenance. Training also requires trainable weights and a suitable reference/trainer setup; a harness cannot fine-tune an arbitrary remote endpoint by itself.
 

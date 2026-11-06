@@ -65,6 +65,7 @@ flowchart TD
     Skills[Loaded skill instructions] --> Context
     Context --> Model[Provider-neutral Model adapter]
     Model --> Runner[Bounded Runner]
+    Scaffold[Optional public plan / evidence review] -.-> Runner
     Runner -->|Action| Policy[Schema, capabilities and approval gate]
     Policy --> Registry[ToolRegistry]
     Registry --> Native[Native Python tools]
@@ -96,12 +97,16 @@ async def run(request):
         reply = await model.respond(context, registry.allowed_definitions())
 
         if reply.is_final():
+            if scaffold_enabled() and not exact_draft_review_is_current(reply):
+                add_public_completion_feedback()  # still consumes ordinary budget
+                continue
             return output_guards.check_and_record(reply, state)
 
         for action in reply.calls:
             tool = registry.resolve(action.name)
             validate(action.arguments, tool.schema)
             policy.check(tool.capability, action.arguments)
+            optional_scaffold.check_plan_before_tool_work(action)
             if approval_is_needed(action):
                 return pending_approval_without_execution(action)
             before_tool_hooks.check(action)
@@ -118,6 +123,8 @@ An ordinary request starts fresh working state. The explicit `resume` path resto
 The conservative runtime fingerprint includes common captured handler values. Mutable lists or caches captured by a handler can therefore invalidate a later approval checkpoint even when its code did not change. Prefer immutable captured configuration and keep changing task state in `ToolContext`; an invalidated checkpoint requires review rather than an automatic retry.
 
 This is a public action/observation loop, often described as ReAct-style orchestration. It does not require extracting, storing or displaying private model chain-of-thought. Plans, tool arguments, observations and decision summaries are sufficient for inspection.
+
+The optional `plan-review` mode registers bounded public plan/review tools. It requires a plan before ordinary tool work and a current review of the exact final draft. Ordinary tool observations invalidate an earlier review. These checks establish workflow consistency and current-run references, not semantic truth. Off mode removes the extra tools and requirements while retaining the ordinary agent loop and policy checks. See [reasoning design](REASONING.md) and the [function walkthrough](CODE_WALKTHROUGH.md).
 
 ## What the extension terms mean
 

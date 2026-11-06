@@ -11,22 +11,33 @@ from .runner import Runner
 from .memory import MemoryStore
 from .builtin_tools import native_tools
 from .extensions import PluginLoader,Skills
+from .reasoning import MODES
 
 ROOT=Path(__file__).resolve().parents[2]
 
 class DemoModel:
     """A scripted integration scenario; no language model or accuracy claim."""
-    def __init__(self):self.step=0
+    def __init__(self,reasoning_mode='off'):self.step=0;self.reasoning_mode=reasoning_mode
     async def respond(self,messages,tools,*,timeout,max_output_tokens):
         self.step+=1
-        if self.step==1:
+        if self.reasoning_mode=='plan-review' and self.step==1:
+            return ModelReply(calls=[ToolCall('demo-plan','record_plan',{'parts':['Count observation quality flags.','Retrieve the quality protocol.']})])
+        step=self.step-(self.reasoning_mode=='plan-review')
+        if step==1:
             sql="SELECT COUNT(*) scheduled, SUM(quality='valid') valid, SUM(quality='suspect') suspect, SUM(quality='missing') missing FROM readings"
             return ModelReply(calls=[ToolCall('demo-sql','query_observations',{'sql':sql})])
-        if self.step==2:return ModelReply(calls=[ToolCall('demo-search','search_reports',{'query':'quality valid missing sample'})])
-        observations=[json.loads(m['content']) for m in messages if m['role']=='tool']
+        if step==2:return ModelReply(calls=[ToolCall('demo-search','search_reports',{'query':'quality valid missing sample'})])
+        observations=[json.loads(m['content']) for m in messages if m['role']=='tool' and m['tool_call_id'] in {'demo-sql','demo-search'}]
         rows=next(o['content']['rows'] for o in observations if 'rows' in o.get('content',{}))
         ids=', '.join(o['artifact_id'] for o in observations)
-        return ModelReply('Scripted integration demo — no model inference.\n\nActual database result: '+json.dumps(rows[0])+'.\nOriginal report passages were also retrieved.\nEvidence artifacts: '+ids+'.\nThis checks the runtime wiring, not semantic answer quality.')
+        draft='Scripted integration demo — no model inference.\n\nActual database result: '+json.dumps(rows[0])+'.\nOriginal report passages were also retrieved.\nEvidence artifacts: '+ids+'.\nThis checks the runtime wiring, not semantic answer quality.'
+        if self.reasoning_mode=='plan-review' and step==3:
+            return ModelReply(calls=[ToolCall('demo-review','review_answer',{
+                'draft':draft,'coverage':[
+                    {'part_id':'P1','status':'supported','artifact_ids':[observations[0]['artifact_id']],'note':'The SQL result supplies the counts.'},
+                    {'part_id':'P2','status':'supported','artifact_ids':[observations[1]['artifact_id']],'note':'Report search returned the protocol passages.'}],
+                'limitations':['This deterministic fixture checks wiring, not model accuracy.']})])
+        return ModelReply(draft)
 
 
 def environment(root):return {**dotenv_values(root/'.env'),**os.environ}
@@ -57,6 +68,8 @@ def parser():
     chat.add_argument('question');chat.add_argument('--session',default='default');chat.add_argument('--allow',action='append',default=[])
     resume=commands.add_parser('resume',help='Approve exact pending actions and continue the saved run')
     resume.add_argument('run_id');resume.add_argument('--approve',action='append',required=True);resume.add_argument('--allow',action='append',default=[])
+    for command in (demo,chat,resume):
+        command.add_argument('--reasoning',choices=MODES,default=None,help='Public task-plan/evidence review; defaults to REASONING_SCAFFOLD or off. Resume with the original mode.')
     trace=commands.add_parser('trace');trace.add_argument('run_id')
     memory=commands.add_parser('memory');memory.add_argument('action',choices=['add','search','forget']);memory.add_argument('--scope',default='fieldnote');memory.add_argument('--key');memory.add_argument('--text');memory.add_argument('--query');memory.add_argument('--ttl',type=float)
     return p
@@ -69,12 +82,14 @@ async def execute(args):
         if args.action=='add':return store.remember(args.scope,args.key,args.text,'explicit_cli',args.ttl)
         if args.action=='forget':return {'deleted':store.forget(args.scope,args.key)}
         return store.search(args.scope,args.query or '',5)
-    if args.command=='demo':model=DemoModel();config=RunConfig()
+    env=environment(root)
+    reasoning_mode=getattr(args,'reasoning',None) or env.get('REASONING_SCAFFOLD') or 'off'
+    if reasoning_mode not in MODES:raise ValueError('REASONING_SCAFFOLD must be off or plan-review')
+    if args.command=='demo':model=DemoModel(reasoning_mode);config=RunConfig(reasoning_mode=reasoning_mode)
     else:
-        env=environment(root)
         if not all(env.get(k) for k in ['LLM_BASE_URL','LLM_API_KEY','LLM_MODEL']):raise ValueError('Set LLM_BASE_URL, LLM_API_KEY and LLM_MODEL in local .env; see .env.example.')
         model=OpenAICompatibleModel(base_url=env['LLM_BASE_URL'],api_key=env['LLM_API_KEY'],model=env['LLM_MODEL'],reasoning_effort=env.get('REASONING_EFFORT') or None)
-        config=RunConfig(allowed_capabilities=RunConfig().allowed_capabilities|frozenset(args.allow))
+        config=RunConfig(allowed_capabilities=RunConfig().allowed_capabilities|frozenset(args.allow),reasoning_mode=reasoning_mode)
     runner=application(root,model=model,store=store,config=config)
     if args.command!='demo':runner.redactor.secrets=(env['LLM_API_KEY'],)
     try:

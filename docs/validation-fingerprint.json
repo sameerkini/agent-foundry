@@ -1,8 +1,24 @@
 {
-  "tests_passed": 83,
+  "tests_passed": 127,
   "tests_skipped": 1,
   "paid_model_calls": 0,
   "files": [
+    {
+      "path": ".env.example",
+      "sha256": "020b773c66ef9da0e40156880d2cb1547710f312efb2b2fd177e589611a18d6e"
+    },
+    {
+      "path": ".vscode/launch.json",
+      "sha256": "703c348edfadd5f272110e799e9485cab6bac52baf7a917727421e5630e4a011"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "sha256": "0f77e30b2db8367ffcc4cd7f816d9590be87394b704dcdbf5a3ac2f51f4d54e6"
+    },
+    {
+      "path": ".vscode/tasks.json",
+      "sha256": "781d4677efdd7ea9b93ebd3b57d1cfdb0dedd33b0ee91662eaf4ed27ddd6fc0a"
+    },
     {
       "path": "examples/fieldnote/adapter.py",
       "sha256": "4c21cbb34534d471fca607d1f06feca7b4bb0eb008daafb2b10edadcd0a3293e"
@@ -16,6 +32,10 @@
       "sha256": "2e572236d0340b2770071a22780377ecc3872b1cce5d1621eaf38d6250f8ab8b"
     },
     {
+      "path": "setup.sh",
+      "sha256": "7269f5d4bbfef1277806546077c4d126e006a7383d0d3c2c532b3854481b0b5e"
+    },
+    {
       "path": "src/agent_foundry/__init__.py",
       "sha256": "a1386bf7d9ee664868c1cae9310ea9184d804888274ef1da4797763a7a69291d"
     },
@@ -25,7 +45,7 @@
     },
     {
       "path": "src/agent_foundry/cli.py",
-      "sha256": "a70a6f387a12eb70eb4a96fa2b69d97579f597192912287e9e9ad5c612be16d0"
+      "sha256": "3e49889d97fea049e933ff4a46ce3809b5d7c0d5fe1e10137e4c4851a8f15bfc"
     },
     {
       "path": "src/agent_foundry/context.py",
@@ -52,12 +72,16 @@
       "sha256": "2af4540bcaabd047b4d67ef94246a67dac6acc490f2a030f03114b1d75fe2836"
     },
     {
+      "path": "src/agent_foundry/reasoning.py",
+      "sha256": "a0f89fbed5b8e54986579db074d7c5d30d473803633356bea9ede4727e97502d"
+    },
+    {
       "path": "src/agent_foundry/registry.py",
-      "sha256": "17f41a9d575ab509713eadd279bd6da04ebc745d8d7fd2e1cdafef6063e9dc8e"
+      "sha256": "6edfdf6115d035f99cef0259a0c95bec0a4c8ec963a97fa039769ee5efcd807d"
     },
     {
       "path": "src/agent_foundry/runner.py",
-      "sha256": "dd9ed3a1b6ddd78f43a292e065b145fed9e566a63b28efe31c3e7b26d592c593"
+      "sha256": "b04f045eebf516b3ff5a51d42c8dab4145776125563d77bf7da1e90bc15e2c6d"
     },
     {
       "path": "src/agent_foundry/sandbox.py",
@@ -65,7 +89,7 @@
     },
     {
       "path": "src/agent_foundry/types.py",
-      "sha256": "309fa10bb7ac1d3bad06b7bd78e908d8da4d2f8428822cc463457a16fd1b4eea"
+      "sha256": "aa253465af65c3c76492f7751cb5f596a5816689b74072b7690feb206459fa04"
     },
     {
       "path": "tests/test_context.py",
@@ -86,6 +110,10 @@
     {
       "path": "tests/test_memory.py",
       "sha256": "ecdd82ee09c8c24890a88971beda1faa52992d68fae5e007bd2bb4101b69d5d3"
+    },
+    {
+      "path": "tests/test_reasoning.py",
+      "sha256": "db1d2b04b2ac7f1d640db3d669cfba90852fa790ec900faba81704bf004dd48d"
     },
     {
       "path": "tests/test_runner.py",

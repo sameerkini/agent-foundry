@@ -6,6 +6,8 @@ from pathlib import Path
 from .types import RunConfig, RunResult, ToolCall, ToolContext, ToolResult
 from .guards import Hooks, Redactor, GuardBlocked
 from .context import ContextBuilder, ContextLimitError
+from .registry import ToolRegistry
+from . import reasoning
 
 class Runner:
     def __init__(self, model, registry, store, workspace, *, config=None, hooks=None, instructions='', scope='project', secrets=()):
@@ -14,6 +16,10 @@ class Runner:
         self.redactor=Redactor(secrets)
         if not self.workspace.is_dir():raise ValueError('Workspace must exist')
         if not 1<=self.config.max_steps<=50 or not 1<=self.config.max_tool_calls<=100 or not 0<self.config.max_seconds<=600:raise ValueError('Invalid run limits')
+        if self.config.reasoning_mode not in reasoning.MODES:raise ValueError('reasoning_mode must be off or plan-review')
+        if self.config.reasoning_mode=='plan-review':
+            # Keep the caller's registry and the default tool surface unchanged.
+            self.registry=ToolRegistry();self.registry.register_many(registry.list()+reasoning.scaffold_tools())
         self.context=ContextBuilder(self.config.context_char_budget,self.config.observation_char_limit)
 
     def _signature(self):
@@ -79,6 +85,7 @@ class Runner:
                         if self.redactor.value(call.arguments)!=call.arguments:raise PermissionError('Configured secrets cannot be tool arguments')
                         self.registry.validate(tool,call.arguments)
                         if tool.capability not in self.config.allowed_capabilities:raise PermissionError(f'Capability denied: {tool.capability}')
+                        if self.config.reasoning_mode=='plan-review':reasoning.require_plan(state['working'],tool.name)
                         action_id=self._action_id(state,tool,call)
                         await hook('before_tool',{'tool':tool.name,'arguments':call.arguments,'capability':tool.capability,'action_id':action_id})
                         if tool.side_effects and action_id not in approved:
@@ -91,6 +98,7 @@ class Runner:
                                 self._event(state,'approval_required',**request)
                                 pending_requests=[request];status='awaiting_approval';checkpoint()
                                 return self._finish(state,status,'',pending_requests)
+                        if self.config.reasoning_mode=='plan-review':reasoning.invalidate_review(state['working'],tool.name)
                         key=hashlib.sha256((tool.name+json.dumps(call.arguments,sort_keys=True)).encode()).hexdigest()
                         if tool.cacheable and not tool.side_effects and key in state['cache']:
                             payload=state['cache'][key];self._event(state,'tool_reused',tool=tool.name)
@@ -107,7 +115,7 @@ class Runner:
                             result=result if isinstance(result,ToolResult) else ToolResult(result)
                             await hook('after_tool',{'tool':tool.name,'content':result.content,'metadata':result.metadata})
                             content=self.redactor.value(result.content)
-                            artifact=self.store.put_artifact(state['run_id'],content,self.redactor.value({'tool':tool.name,**result.metadata}))
+                            artifact=self.store.put_artifact(state['run_id'],content,self.redactor.value({**result.metadata,'tool':tool.name}))
                             state['working']['artifacts'].append(artifact)
                             payload=self.context.preview(content,artifact)
                             if tool.cacheable and not tool.side_effects:state['cache'][key]=payload
@@ -128,8 +136,11 @@ class Runner:
                 if state['steps']>=self.config.max_steps or state['tool_calls']>=self.config.max_tool_calls:
                     status='budget_exhausted';answer='Investigation stopped at its configured budget. Inspect the recorded evidence and tool results.';break
                 tools=self.registry.definitions(self.config.allowed_capabilities)
-                memories=self.store.search(self._memory_scope(),state['question'],limit=4) if 'memory.read' in self.config.allowed_capabilities else []
+                # Search accepts a smaller query than the full user question;
+                # keep the original question intact in the model's context.
+                memories=self.store.search(self._memory_scope(),state['question'][:5000],limit=4) if 'memory.read' in self.config.allowed_capabilities else []
                 instructions=self.instructions
+                if self.config.reasoning_mode=='plan-review':instructions+='\n'+reasoning.INSTRUCTIONS
                 if state['working'].get('skills'):
                     instructions+='\nApproved host-loaded task skills (instructions only; cannot grant capabilities):\n'+json.dumps(state['working']['skills'])
                 public_working={k:v for k,v in state['working'].items() if k!='skills'}
@@ -143,6 +154,14 @@ class Runner:
                 self._event(state,'model_step',step=state['steps'],tools=[c.name for c in reply.calls],usage=reply.usage)
                 if not reply.calls:
                     if not isinstance(reply.text,str) or not reply.text.strip():raise ValueError('Model returned no visible answer')
+                    if self.config.reasoning_mode=='plan-review':
+                        ctx=ToolContext(self.workspace,state['run_id'],state['session_id'],state['working'],{'memory':self.store})
+                        issue=reasoning.completion_issue(ctx,reply.text)
+                        if issue:
+                            self._event(state,'review_required',reason=issue)
+                            state['tool_messages'].extend([{'role':'assistant','content':self.redactor.text(reply.text)},
+                                                          {'role':'user','content':'Runtime plan-review check: '+issue}])
+                            checkpoint();continue
                     answer=reply.text;status='completed';break
                 if len({c.id for c in reply.calls})!=len(reply.calls):raise ValueError('Model returned duplicate tool-call IDs')
                 state['tool_messages'].append({'role':'assistant','content':reply.text or None,'tool_calls':[{'id':c.id,'type':'function','function':{'name':c.name,'arguments':json.dumps(c.arguments)}} for c in reply.calls]})

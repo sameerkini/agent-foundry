@@ -1,6 +1,7 @@
 """One capability registry for native, plugin, MCP and runtime tools."""
 from __future__ import annotations
-import hashlib, inspect, json, re, marshal
+import hashlib, inspect, json, re
+from types import CodeType
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from jsonschema import Draft202012Validator
@@ -36,9 +37,20 @@ class ToolRegistry:
         def stable(value,seen=None):
             seen=set() if seen is None else seen
             if value is None or isinstance(value,(str,int,float,bool)):return value
+            if isinstance(value,bytes):return {'bytes':value.hex()}
+            if isinstance(value,complex):return {'complex':[value.real,value.imag]}
             if isinstance(value,Path):return str(value.resolve())
             if id(value) in seen:return {'cycle':type(value).__qualname__}
             seen=seen|{id(value)}
+            if isinstance(value,CodeType):
+                # marshal.dumps(code) includes reference-count-dependent flags:
+                # first execution can change it without any code change. Hash
+                # semantic code attributes and nested constants canonically.
+                return {key:stable(getattr(value,key),seen) for key in (
+                    'co_code','co_consts','co_names','co_varnames','co_freevars',
+                    'co_cellvars','co_argcount','co_posonlyargcount',
+                    'co_kwonlyargcount','co_flags','co_nlocals','co_stacksize',
+                    'co_exceptiontable')}
             if isinstance(value,dict):return {str(k):stable(v,seen) for k,v in sorted(value.items(),key=lambda pair:str(pair[0]))}
             if isinstance(value,(list,tuple)):return [stable(v,seen) for v in value]
             if isinstance(value,(set,frozenset)):return sorted([stable(v,seen) for v in value],key=str)
@@ -52,7 +64,7 @@ class ToolRegistry:
             fn=t.handler
             code=getattr(fn,'__code__',None)
             binding={'module':getattr(fn,'__module__',''),'name':getattr(fn,'__qualname__',type(fn).__qualname__),
-                     'bytecode':hashlib.sha256(marshal.dumps(code)).hexdigest() if code else None,
+                     'bytecode':hashlib.sha256(json.dumps(stable(code),sort_keys=True).encode()).hexdigest() if code else None,
                      'defaults':stable(getattr(fn,'__defaults__',None)),
                      'closure':[stable(cell.cell_contents) for cell in (getattr(fn,'__closure__',None) or [])]}
             rows.append({'name':t.name,'schema':t.schema,'capability':t.capability,'side_effects':t.side_effects,

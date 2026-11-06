@@ -4,6 +4,8 @@ The goal is a reusable, inspectable agent harness, with Fieldnote as a working e
 
 The local v0 already supplies the bounded runner, shared tool registry, guards/hooks, explicit SQLite memory, skills/plugin loading, an MCP adapter and an optional Docker executor. The scripted Fieldnote CLI example and real local MCP demonstration are exercised. The phases below define verification and improvement gates, rather than claiming those layers remain entirely unimplemented. Live remote provider behavior, external MCP servers, actual Docker isolation and a rebuilt browser UI remain separate milestones. See `VALIDATION.md` for exact evidence.
 
+The optional public `plan-review` scaffold is implemented as a workflow control, with off mode as the default. Its next gate is a matched quality/cost comparison, not additional planning machinery. The [code walkthrough](CODE_WALKTHROUGH.md) and workspace debugger presets support inspection before further expansion.
+
 ## 1 Harden the implemented core
 
 Implement the provider-neutral model contract, typed tool registry, bounded runner, public action/observation trace, capability gates, input/output checks and lifecycle hooks. Keep native tools usable without a network connection through a deterministic model fixture. Distinguish a demonstration fixture from live inference.
@@ -39,6 +41,8 @@ The current CLI example covers SQL, report search and calculations. Reconnecting
 ## 6 Measure which features help
 
 Freeze model, corpus, settings and question families before comparing context strategies, memory, skills, MCP adapters or sandbox tools. Remove one component at a time and preserve the actual outputs and unknown grades. Inspect both improvements and errors introduced by review.
+
+Include `reasoning_mode=off` versus `plan-review`, keeping provider reasoning effort fixed. Count extra calls, incomplete plans, stale-review rejections and unsupported self-reviews separately from final answer accuracy.
 
 **Exit evidence:** matched comparisons with explicit denominators, source-based analysis of failures, cost/latency records and version fingerprints. A successful tool execution or valid citation is not a correctness grade. Inspected confirmation cases become regression data.
 
