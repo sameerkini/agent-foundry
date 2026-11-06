@@ -4,4 +4,4 @@ All sites, observations, maintenance notes, and protocols are fictional and newl
 
 Use explicit sensor units. Default numerical summaries exclude suspect and missing readings; a missing reading is SQL NULL and never zero. Coverage counts all scheduled rows in its denominator. Dates and timestamps are UTC. An arithmetic sample mean is not a time-weighted mean. The six manifest documents give the detailed protocols.
 
-Rebuild reproducibly with `python scripts/build_demo.py`. Evaluation references are kept outside the runtime workspace; they are not retrieval sources.
+This example ships a fixed synthetic snapshot. Evaluation references are kept outside the runtime workspace; they are not retrieval sources.
